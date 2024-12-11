@@ -2,7 +2,7 @@
  * @Author: Peihua
  * @Date: 2024-12-09 18:01:16
  * @LastEditors: Peihua
- * @LastEditTime: 2024-12-09 19:04:42
+ * @LastEditTime: 2024-12-11 14:29:11
  * @FilePath: \fe\src\pages\logistics\edit\constants.ts
  */
 import { FormRule } from 'tdesign-vue-next';
@@ -52,13 +52,15 @@ export const defaultItemParam = {
 
 export const LogisticsData = {
   solutionParam: {
-    solutionCode: '',
+    solutionCode: 'CN_GLO_EXP',
     doorPickupParam: cloneDeep(Address),
   },
-  packageParams: {
-    weight: 0,
-    itemParams: [cloneDeep(defaultItemParam)],
-  },
+  packageParams: [
+    {
+      weight: 0,
+      itemParams: [cloneDeep(defaultItemParam)],
+    },
+  ],
   senderParam: cloneDeep(Address),
   receiverParam: cloneDeep(Address),
   returnerParam: cloneDeep(Address),

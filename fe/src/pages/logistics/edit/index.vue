@@ -16,69 +16,68 @@
 
         <!-- 合同名称,合同类型 -->
         <t-row class="row-gap" :gutter="[16, 24]">
-          <t-col :span="12">
-            <t-form-item label="包裹总重/克" name="packageParams.weight">
-              <!-- <t-input v-model="formData.name" :style="{ width: '322px' }" placeholder="请输入内容" /> -->
-              <t-input-number
-                v-model="formData.packageParams.weight"
-                theme="row"
-                suffix=""
-                style="width: 200px"
-              ></t-input-number>
-            </t-form-item>
-          </t-col>
-          <t-col :span="24">
-            <t-form-item label="物品信息" name="type">
-              <div>
-                <t-button
-                  theme="primary"
-                  variant="outline"
-                  @click="() => formData.packageParams.itemParams.push(defaultItemParam)"
-                  >添加物品</t-button
-                >
-
-                <t-row
-                  v-for="(item, index) in formData.packageParams.itemParams"
-                  :key="index"
-                  :gutter="[8, 12]"
-                  style="margin-top: 12px"
-                  class="package-item"
-                >
-                  <t-col :span="6">
-                    <t-form-item label="英文名称" :name="`formData.packageParams.itemParams[${index}].englishName`">
-                      <t-input v-model="item.englishName" placeholder="请输入物品英文名称"></t-input>
-                    </t-form-item>
-                  </t-col>
-                  <t-col :span="6">
-                    <t-form-item label="数量" :name="`formData.packageParams.itemParams[${index}].quantity`">
-                      <t-input-number v-model="item.quantity"></t-input-number>
-                    </t-form-item>
-                  </t-col>
-                  <t-col :span="6">
-                    <t-form-item label="价值" :name="`formData.packageParams.itemParams[${index}].unitPrice`">
-                      <t-input-number v-model="item.unitPrice" />
-                    </t-form-item>
-                  </t-col>
-                  <t-col :span="6">
-                    <t-form-item
-                      label="货币单位"
-                      :name="`formData.packageParams.itemParams[${index}].unitPriceCurrency`"
-                    >
-                      <t-input v-model="item.unitPriceCurrency" placeholder="货币单位" />
-                    </t-form-item>
-                  </t-col>
-
-                  <t-button
-                    variant="dashed"
-                    block
-                    theme="danger"
-                    @click="() => formData.packageParams.itemParams.splice(index, 1)"
-                    >删除</t-button
+          <template v-for="(_package, packageIndex) in formData.packageParams" :key="packageIndex">
+            <t-col :span="12">
+              <t-form-item label="包裹总重/克" name="packageParams.weight">
+                <!-- <t-input v-model="formData.name" :style="{ width: '322px' }" placeholder="请输入内容" /> -->
+                <t-input-number v-model="_package.weight" theme="row" suffix="" style="width: 200px"></t-input-number>
+              </t-form-item>
+            </t-col>
+            <t-col :span="24">
+              <t-form-item label="物品信息" name="type">
+                <div>
+                  <t-button theme="primary" variant="outline" @click="() => _package.itemParams.push(defaultItemParam)"
+                    >添加物品</t-button
                   >
-                </t-row>
-              </div>
-            </t-form-item>
-          </t-col>
+
+                  <t-row
+                    v-for="(item, index) in _package.itemParams"
+                    :key="index"
+                    :gutter="[8, 12]"
+                    style="margin-top: 12px"
+                    class="package-item"
+                  >
+                    <t-col :span="6">
+                      <t-form-item
+                        label="英文名称"
+                        :name="`formData.packageParams[${packageIndex}].itemParams[${index}].englishName`"
+                      >
+                        <t-input v-model="item.englishName" placeholder="请输入物品英文名称"></t-input>
+                      </t-form-item>
+                    </t-col>
+                    <t-col :span="6">
+                      <t-form-item
+                        label="数量"
+                        :name="`formData.packageParams[${packageIndex}].itemParams[${index}].quantity`"
+                      >
+                        <t-input-number v-model="item.quantity"></t-input-number>
+                      </t-form-item>
+                    </t-col>
+                    <t-col :span="6">
+                      <t-form-item
+                        label="价值"
+                        :name="`formData.packageParams[${packageIndex}].itemParams[${index}].unitPrice`"
+                      >
+                        <t-input-number v-model="item.unitPrice" />
+                      </t-form-item>
+                    </t-col>
+                    <t-col :span="6">
+                      <t-form-item
+                        label="货币单位"
+                        :name="`formData.packageParams[${packageIndex}].itemParams[${index}].unitPriceCurrency`"
+                      >
+                        <t-input v-model="item.unitPriceCurrency" placeholder="货币单位" />
+                      </t-form-item>
+                    </t-col>
+
+                    <t-button variant="dashed" block theme="danger" @click="() => _package.itemParams.splice(index, 1)"
+                      >删除</t-button
+                    >
+                  </t-row>
+                </div>
+              </t-form-item>
+            </t-col>
+          </template>
         </t-row>
 
         <div class="form-basic-container-title form-title-gap">发件人信息</div>

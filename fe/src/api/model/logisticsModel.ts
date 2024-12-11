@@ -2,7 +2,7 @@
  * @Author: Peihua
  * @Date: 2024-12-09 13:28:28
  * @LastEditors: Peihua
- * @LastEditTime: 2024-12-09 22:49:27
+ * @LastEditTime: 2024-12-10 06:07:57
  * @FilePath: \fe\src\api\model\logisticsModel.ts
  * @Description: 物流接口类型定义
  */
@@ -28,7 +28,7 @@ export interface LogisticsBody {
       unitPrice: number;
       unitPriceCurrency: string;
     }[];
-  };
+  }[];
   senderParam: Address;
   receiverParam: Address;
   returnerParam: Address;

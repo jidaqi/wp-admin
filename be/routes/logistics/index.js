@@ -1,5 +1,24 @@
 // import S from "fluent-json-schema";
 const S = require('fluent-json-schema')
+const { dev, prod } = require('../../config')
+const crypto = require('crypto')
+const { URLSearchParams } = require('url')
+
+function md5(content, keys, charset = 'utf-8') {
+  let sign = null;
+  content = content + keys;
+
+  try {
+    const md5sum = crypto.createHash('md5');
+    md5sum.update(content, charset);
+    sign = md5sum.digest('base64');
+  } catch (e) {
+    throw new Error(e);
+  }
+
+  return sign;
+}
+
 
 const addressSchema =
   S.object()
@@ -63,9 +82,43 @@ module.exports = async function (
     handler: async (request, reply) => {
       const body = request.body
 
+      const timestamp = Date.now()
+
+      const logistics_interface = JSON.stringify({
+        outOrderId: `hanyial_${timestamp}`,
+        ...body
+      })
+
+      const data_digest = md5(logistics_interface, prod.appSecret)
+
+
+      const reqData = {
+        logistic_provider_id: prod.logistic_provider_id,
+        msg_type: 'cnge.order.create',
+        from_code: 'SANDBOX477847',
+        to_code: 'CNGCP-OPEN',
+        data_digest,
+        logistics_interface
+      }
+
+      const params = new URLSearchParams()
+      params.append('from_code', '477847')
+      params.append('to_code', 'CNGCP-OPEN')
+      params.append('data_digest', data_digest)
+
+      const url = prod.url
+      // + `?${params.toString()}`
+      const { status, data } = await fastify.axios.post(url, { ...reqData }, {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        }
+      })
+
       return {
-        status: 200,
-        body
+        status,
+        data,
+        reqData,
+        url
       }
     },
   });
