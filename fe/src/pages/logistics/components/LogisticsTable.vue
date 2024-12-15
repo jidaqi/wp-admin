@@ -31,44 +31,34 @@
           <t-col :span="10">
             <t-row :gutter="[16, 24]">
               <t-col :span="3">
-                <t-form-item label="合同名称" name="name">
+                <t-form-item name="name">
                   <t-input-adornment
                     prepend="国际运单号"
                     class="form-item-content"
                     :style="{ minWidth: '134px', width: '100%' }"
                   >
-                    <t-input v-model="formData.name" type="search" placeholder="请输入国际运单号" />
+                    <t-input v-model="formData.name" type="search" clearable placeholder="请输入国际运单号" />
                   </t-input-adornment>
                 </t-form-item>
               </t-col>
               <t-col :span="3">
-                <t-form-item label="合同状态" name="status">
+                <t-form-item name="status">
                   <t-select
                     v-model="formData.status"
                     class="form-item-content"
                     :options="CONTRACT_STATUS_OPTIONS"
-                    placeholder="请选择合同状态"
+                    placeholder="物流方案"
+                    clearable
                   />
                 </t-form-item>
               </t-col>
               <t-col :span="3">
-                <t-form-item label="合同编号" name="no">
+                <t-form-item name="no">
                   <t-input
                     v-model="formData.no"
                     class="form-item-content"
-                    placeholder="请输入合同编号"
+                    placeholder="物流状态"
                     :style="{ minWidth: '134px' }"
-                  />
-                </t-form-item>
-              </t-col>
-              <t-col :span="3">
-                <t-form-item label="合同类型" name="type">
-                  <t-select
-                    v-model="formData.type"
-                    style="display: inline-block"
-                    class="form-item-content"
-                    :options="CONTRACT_TYPE_OPTIONS"
-                    placeholder="请选择合同类型"
                   />
                 </t-form-item>
               </t-col>
@@ -102,26 +92,7 @@
           @page-change="rehandlePageChange"
           @change="rehandleChange"
         >
-          <template #status="{ row }">
-            <t-tag v-if="row.status === CONTRACT_STATUS.FAIL" theme="danger" variant="light"> 审核失败 </t-tag>
-            <t-tag v-if="row.status === CONTRACT_STATUS.AUDIT_PENDING" theme="warning" variant="light"> 待审核 </t-tag>
-            <t-tag v-if="row.status === CONTRACT_STATUS.EXEC_PENDING" theme="warning" variant="light"> 待履行 </t-tag>
-            <t-tag v-if="row.status === CONTRACT_STATUS.EXECUTING" theme="success" variant="light"> 履行中 </t-tag>
-            <t-tag v-if="row.status === CONTRACT_STATUS.FINISH" theme="success" variant="light"> 已完成 </t-tag>
-          </template>
-          <template #contractType="{ row }">
-            <p v-if="row.contractType === CONTRACT_TYPES.MAIN">审核失败</p>
-            <p v-if="row.contractType === CONTRACT_TYPES.SUB">待审核</p>
-            <p v-if="row.contractType === CONTRACT_TYPES.SUPPLEMENT">待履行</p>
-          </template>
-          <template #paymentType="{ row }">
-            <p v-if="row.paymentType === CONTRACT_PAYMENT_TYPES.PAYMENT" class="payment-col">
-              付款<trend class="dashboard-item-trend" type="up" />
-            </p>
-            <p v-if="row.paymentType === CONTRACT_PAYMENT_TYPES.RECEIPT" class="payment-col">
-              收款<trend class="dashboard-item-trend" type="down" />
-            </p>
-          </template>
+          <template #createdAt="{ col, row }"> {{ dayjs(row[col.colKey]).format('YYYY-MM-DD HH:mm:ss') }} </template>
           <template #op="slotProps">
             <a class="t-button-link" @click="rehandleClickOp(slotProps)">管理</a>
             <a class="t-button-link" @click="handleClickDelete(slotProps)">删除</a>
@@ -142,55 +113,32 @@
 import { ref, computed, onMounted, Ref } from 'vue';
 import { MessagePlugin, PrimaryTableCol, TableRowData, PageInfo } from 'tdesign-vue-next';
 import { useRouter } from 'vue-router';
-import Trend from '@/components/trend/index.vue';
-import { getList } from '@/api/list';
+import dayjs from 'dayjs';
+import { getLogistics } from '@/api/logistics';
 import { useSettingStore } from '@/store';
 import { prefix } from '@/config/global';
 
-import {
-  CONTRACT_STATUS,
-  CONTRACT_STATUS_OPTIONS,
-  CONTRACT_TYPES,
-  CONTRACT_TYPE_OPTIONS,
-  CONTRACT_PAYMENT_TYPES,
-} from '@/constants';
+import { CONTRACT_STATUS_OPTIONS } from '@/constants';
 
 const store = useSettingStore();
 const router = useRouter();
 
 const COLUMNS: PrimaryTableCol<TableRowData>[] = [
   {
-    title: '合同名称',
+    title: '物流订单号',
     fixed: 'left',
     width: 200,
     ellipsis: true,
     align: 'left',
-    colKey: 'name',
-  },
-  { title: '合同状态', colKey: 'status', width: 200 },
-  {
-    title: '合同编号',
-    width: 200,
-    ellipsis: true,
-    colKey: 'no',
+    colKey: 'orderCode',
   },
   {
-    title: '合同类型',
+    title: '创建时间',
+    fixed: 'left',
     width: 200,
     ellipsis: true,
-    colKey: 'contractType',
-  },
-  {
-    title: '合同收付类型',
-    width: 200,
-    ellipsis: true,
-    colKey: 'paymentType',
-  },
-  {
-    title: '合同金额 (元)',
-    width: 200,
-    ellipsis: true,
-    colKey: 'amount',
+    align: 'left',
+    colKey: 'createdAt',
   },
   {
     align: 'left',
@@ -226,7 +174,8 @@ const dataLoading = ref(false);
 const fetchData = async () => {
   dataLoading.value = true;
   try {
-    const { list } = await getList();
+    const { data: list } = await getLogistics();
+    console.log(list);
     data.value = list;
     pagination.value = {
       ...pagination.value,

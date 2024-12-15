@@ -2,7 +2,7 @@
  * @Author: Peihua
  * @Date: 2024-12-08 23:32:11
  * @LastEditors: Peihua
- * @LastEditTime: 2024-12-09 22:56:32
+ * @LastEditTime: 2024-12-15 12:20:56
  * @FilePath: \fe\src\config\proxy.ts
  * @Description:
  */
@@ -10,7 +10,7 @@ export default {
   isRequestProxy: true,
   development: {
     // 开发环境接口请求
-    host: 'http://127.0.0.1:3000',
+    host: 'http://localhost:3000',
     // 开发环境 cdn 路径
     cdn: '',
   },

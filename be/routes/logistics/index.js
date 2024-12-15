@@ -1,8 +1,9 @@
-// import S from "fluent-json-schema";
 const S = require('fluent-json-schema')
 const { dev, prod } = require('../../config')
 const crypto = require('crypto')
 const { URLSearchParams } = require('url')
+const Logistics = require('../../models/Logistics.model.js')
+const Address = require('../../models/Address.model.js')
 
 function md5(content, keys, charset = 'utf-8') {
   let sign = null;
@@ -28,6 +29,9 @@ const addressSchema =
     .prop("state", S.string()) // 州/省
     .prop("city", S.string()) // 城市
     .prop("detailAddress", S.string()) // 详细地址
+    .prop("telephone", S.string()) // 电话
+    .prop("district", S.string()) // 区级
+    .prop("street", S.string()) // 街道
 
 module.exports = async function (
   fastify,
@@ -45,7 +49,7 @@ module.exports = async function (
             .required()
             .prop(
               "doorPickupParam", // 上门揽收信息
-              addressSchema.required()
+              addressSchema
             )
         )
         .required()
@@ -68,15 +72,15 @@ module.exports = async function (
         )
         .prop(
           "senderParam", // 发件人信息
-          addressSchema.required()
+          addressSchema
         )
         .prop(
           "receiverParam", // 收件人信息
-          addressSchema.required()
+          addressSchema
         )
         .prop(
           "returnerParam", // 退件人信息
-          addressSchema.required()
+          addressSchema
         ),
     },
     handler: async (request, reply) => {
@@ -84,13 +88,12 @@ module.exports = async function (
 
       const timestamp = Date.now()
 
-      const logistics_interface = JSON.stringify({
+      const logistics_interface = {
         outOrderId: `hanyial_${timestamp}`,
         ...body
-      })
+      }
 
-      const data_digest = md5(logistics_interface, prod.appSecret)
-
+      const data_digest = md5(JSON.stringify(logistics_interface), prod.appSecret)
 
       const reqData = {
         logistic_provider_id: prod.logistic_provider_id,
@@ -98,28 +101,89 @@ module.exports = async function (
         from_code: 'SANDBOX477847',
         to_code: 'CNGCP-OPEN',
         data_digest,
-        logistics_interface
+        logistics_interface: JSON.stringify(logistics_interface)
       }
 
-      const params = new URLSearchParams()
-      params.append('from_code', '477847')
-      params.append('to_code', 'CNGCP-OPEN')
-      params.append('data_digest', data_digest)
-
       const url = prod.url
-      // + `?${params.toString()}`
       const { status, data } = await fastify.axios.post(url, { ...reqData }, {
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded'
         }
       })
 
-      return {
-        status,
-        data,
-        reqData,
-        url
+      if (status !== 200) {
+        reply.send({
+          code: -1,
+          data: null,
+          message: '第三方服务调用失败'
+        })
+      }
+
+      if (data && data?.data && data?.success === 'true') {
+        await Logistics.create(
+          {
+            outOrderId: logistics_interface.outOrderId,
+            solutionCode: body.solutionParam.solutionCode,
+            packageParams: body.packageParams,
+            doorPickupParam: body.solutionParam.doorPickupParam,
+            senderParam: body.senderParam,
+            receiverParam: body.receiverParam,
+            returnerParam: body.returnerParam,
+            ...data.data
+          }, {
+            include: [
+              { model: Address, as: 'senderParam' },
+              { model: Address, as: 'doorPickupParam' },
+              { model: Address, as: 'receiverParam' },
+              { model: Address, as: 'returnerParam' },
+            ]
+          })
+        const LogisticsData = await Logistics.findAll({
+          include: [
+            { model: Address, as: 'senderParam' },
+            { model: Address, as: 'doorPickupParam' },
+            { model: Address, as: 'receiverParam' },
+            { model: Address, as: 'returnerParam' },
+          ]
+        })
+        reply.send({
+          code: 0,
+          data: null,
+          message: '订单创建成功',
+          database: LogisticsData
+        })
+      } else {
+        request.log.error({ 'CreateLogisticsError': data })
+        reply.send({
+          code: -1,
+          data: null,
+          message: `errorCode: ${data.errorCode} errorMsg: ${data.errorMsg}`
+        })
       }
     },
   });
+
+  fastify.route({
+    url: '/list',
+    method: 'get',
+    handler: async (request, reply) => {
+      const params = request.params
+      request.log.info({ params })
+
+      const LogisticsData = await Logistics.findAll({
+        include: [
+          { model: Address, as: 'senderParam' },
+          { model: Address, as: 'doorPickupParam' },
+          { model: Address, as: 'receiverParam' },
+          { model: Address, as: 'returnerParam' },
+        ]
+      })
+
+      reply.send({
+        code: 0,
+        data: LogisticsData,
+        message: 'success'
+      })
+    }
+  })
 };

@@ -2,7 +2,7 @@
  * @Author: Peihua
  * @Date: 2024-12-09 18:01:16
  * @LastEditors: Peihua
- * @LastEditTime: 2024-12-11 14:29:11
+ * @LastEditTime: 2024-12-15 01:38:28
  * @FilePath: \fe\src\pages\logistics\edit\constants.ts
  */
 import { FormRule } from 'tdesign-vue-next';
@@ -41,6 +41,8 @@ export const Address = {
   state: '',
   city: '',
   detailAddress: '',
+  telephone: '',
+  district: '',
 };
 
 export const defaultItemParam = {

@@ -1,6 +1,7 @@
 // axios配置  可自行根据项目进行更改，只需更改该文件即可，其他文件可以不动
 import isString from 'lodash/isString';
 import merge from 'lodash/merge';
+import { MessagePlugin } from 'tdesign-vue-next';
 import type { AxiosTransform, CreateAxiosOptions } from './AxiosTransform';
 import { VAxios } from './Axios';
 import proxy from '@/config/proxy';
@@ -37,17 +38,20 @@ const transform: AxiosTransform = {
     // 错误的时候返回
     const { data } = res;
     if (!data) {
+      MessagePlugin.error('服务器错误');
       throw new Error('请求接口错误');
     }
 
     //  这里 code为 后台统一的字段，需要在 types.ts内修改为项目自己的接口返回格式
-    const { code } = data;
+    const { code, message } = data;
 
     // 这里逻辑可以根据项目进行修改
     const hasSuccess = data && code === 0;
     if (hasSuccess) {
-      return data.data;
+      return data;
     }
+
+    MessagePlugin.error(message);
 
     throw new Error(`请求接口错误, 错误码: ${code}`);
   },
@@ -132,7 +136,14 @@ const transform: AxiosTransform = {
 
     config.retryCount = config.retryCount || 0;
 
-    if (config.retryCount >= config.requestOptions.retry.count) return Promise.reject(error);
+    if (config.retryCount >= config.requestOptions.retry.count) {
+      if (error.response?.data?.message) {
+        MessagePlugin.error(error.response?.data?.message);
+      } else {
+        MessagePlugin.error(error.message);
+      }
+      return Promise.reject(error);
+    }
 
     config.retryCount += 1;
 

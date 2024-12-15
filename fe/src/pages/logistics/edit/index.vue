@@ -1,5 +1,6 @@
 <template>
   <t-form
+    id="logistics-container"
     ref="form"
     class="base-form"
     :data="formData"
@@ -80,6 +81,52 @@
           </template>
         </t-row>
 
+        <div class="form-basic-container-title form-title-gap">揽收信息</div>
+
+        <!-- 发件人信息 -->
+        <t-row class="row-gap" :gutter="[16, 24]">
+          <t-col :span="6">
+            <t-form-item label="姓名">
+              <t-input v-model="formData.solutionParam.doorPickupParam.name"></t-input>
+            </t-form-item>
+          </t-col>
+          <t-col :span="6">
+            <t-form-item label="电话">
+              <t-input v-model="formData.solutionParam.doorPickupParam.telephone"></t-input>
+            </t-form-item>
+          </t-col>
+          <t-col :span="6">
+            <t-form-item label="邮编">
+              <t-input v-model="formData.solutionParam.doorPickupParam.zipCode"></t-input>
+            </t-form-item>
+          </t-col>
+          <t-col :span="6">
+            <t-form-item label="ISO国家码">
+              <t-input v-model="formData.solutionParam.doorPickupParam.countryCode" placeholder="CN"></t-input>
+            </t-form-item>
+          </t-col>
+          <t-col :span="6">
+            <t-form-item label="州/省">
+              <t-input v-model="formData.solutionParam.doorPickupParam.state"></t-input>
+            </t-form-item>
+          </t-col>
+          <t-col :span="6">
+            <t-form-item label="城市">
+              <t-input v-model="formData.solutionParam.doorPickupParam.city"></t-input>
+            </t-form-item>
+          </t-col>
+          <t-col :span="6">
+            <t-form-item label="区/街道">
+              <t-input v-model="formData.solutionParam.doorPickupParam.district"></t-input>
+            </t-form-item>
+          </t-col>
+          <t-col :span="6">
+            <t-form-item label="详细地址">
+              <t-input v-model="formData.solutionParam.doorPickupParam.detailAddress"></t-input>
+            </t-form-item>
+          </t-col>
+        </t-row>
+
         <div class="form-basic-container-title form-title-gap">发件人信息</div>
 
         <!-- 发件人信息 -->
@@ -87,6 +134,11 @@
           <t-col :span="6">
             <t-form-item label="姓名">
               <t-input v-model="formData.senderParam.name"></t-input>
+            </t-form-item>
+          </t-col>
+          <t-col :span="6">
+            <t-form-item label="电话">
+              <t-input v-model="formData.senderParam.telephone"></t-input>
             </t-form-item>
           </t-col>
           <t-col :span="6">
@@ -126,6 +178,11 @@
             </t-form-item>
           </t-col>
           <t-col :span="6">
+            <t-form-item label="电话">
+              <t-input v-model="formData.receiverParam.telephone"></t-input>
+            </t-form-item>
+          </t-col>
+          <t-col :span="6">
             <t-form-item label="邮编">
               <t-input v-model="formData.receiverParam.zipCode"></t-input>
             </t-form-item>
@@ -159,6 +216,11 @@
           <t-col :span="6">
             <t-form-item label="姓名">
               <t-input v-model="formData.returnerParam.name"></t-input>
+            </t-form-item>
+          </t-col>
+          <t-col :span="6">
+            <t-form-item label="电话">
+              <t-input v-model="formData.returnerParam.telephone"></t-input>
             </t-form-item>
           </t-col>
           <t-col :span="6">
@@ -210,22 +272,41 @@ export default {
 <script setup lang="ts">
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
-import { MessagePlugin } from 'tdesign-vue-next';
+import { MessagePlugin, LoadingPlugin } from 'tdesign-vue-next';
 import { FORM_RULES, LogisticsData, defaultItemParam } from './constants';
 import { addLogistics } from '@/api/logistics';
 
 const router = useRouter();
 
+const form = ref();
 const formData = ref({ ...LogisticsData });
 
 const onReset = () => {
   router.back();
 };
-const onSubmit = ({ validateResult }) => {
-  addLogistics(formData.value);
-  if (validateResult === true) {
-    MessagePlugin.success('新建成功');
+
+const loadingInstance = ref();
+const loadingHide = () => {
+  if (loadingInstance.value) {
+    loadingInstance.value.hide();
   }
+};
+const onSubmit = ({ validateResult }) => {
+  loadingInstance.value = LoadingPlugin({
+    attach: () => form.value,
+    showOverlay: true,
+  });
+  addLogistics(formData.value)
+    .then((result) => {
+      loadingHide();
+      console.log(result);
+      if (result.code === 0) {
+        MessagePlugin.success(result.message);
+      }
+    })
+    .catch(() => {
+      loadingHide();
+    });
 };
 </script>
 
