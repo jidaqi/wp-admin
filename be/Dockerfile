@@ -10,4 +10,4 @@ RUN npm i
 
 COPY . .
 
-CMD ["npm", "run watch"]
+CMD ["yarn", "watch"]
