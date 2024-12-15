@@ -250,4 +250,13 @@ module.exports = async function (
       }
     }
   })
+
+  fastify.route({
+    url: '/callback',
+    method: 'post',
+    handler: (request, reply) => {
+      const body = request.body
+      request.log.info({ cainiaoCALLBACK: body })
+    }
+  })
 };
