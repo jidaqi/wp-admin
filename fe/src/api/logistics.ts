@@ -2,12 +2,12 @@
  * @Author: Peihua
  * @Date: 2024-12-09 13:28:08
  * @LastEditors: Peihua
- * @LastEditTime: 2024-12-15 15:39:13
+ * @LastEditTime: 2024-12-15 20:51:27
  * @FilePath: \fe\src\api\logistics.ts
  * @Description:
  */
 import { request } from '@/utils/request';
-import type { LogisticsBody } from './model/logisticsModel';
+import type { LogisticsBody, LogisticsList, LogisticsQuery } from './model/logisticsModel';
 import { Result } from '@/types/axios';
 
 const Api = {
@@ -16,16 +16,17 @@ const Api = {
   Cancel: '/logistics/cancel',
 };
 
-export function addLogistics(data: LogisticsBody): Promise<Result> {
+export function addLogistics(data: LogisticsBody): Promise<Result<LogisticsList>> {
   return request.post({
     url: Api.AddLogistics,
     data,
   });
 }
 
-export function getLogistics(): Promise<Result> {
+export function getLogistics(query: LogisticsQuery): Promise<Result> {
   return request.get({
     url: Api.List,
+    params: query
   });
 }
 

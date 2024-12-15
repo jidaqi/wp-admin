@@ -1,8 +1,10 @@
+import { ListQuery } from "./commonModel";
+
 /*
  * @Author: Peihua
  * @Date: 2024-12-09 13:28:28
  * @LastEditors: Peihua
- * @LastEditTime: 2024-12-10 06:07:57
+ * @LastEditTime: 2024-12-15 20:46:27
  * @FilePath: \fe\src\api\model\logisticsModel.ts
  * @Description: 物流接口类型定义
  */
@@ -32,4 +34,38 @@ export interface LogisticsBody {
   senderParam: Address;
   receiverParam: Address;
   returnerParam: Address;
+}
+
+export interface LogisticsList {
+  count: number;
+  rows: {
+    createdAt: string;
+    doorPickupParam: Address;
+    doorPickupParamId: 10;
+    id: 3;
+    laneCode: string;
+    laneLastMileCP: string;
+    laneName: string;
+    orderCode: string;
+    outOrderId: string;
+    packageParams: Address;
+    receiverParam: Address;
+    receiverParamId: number;
+    returnerParam: Address;
+    returnerParamId: number;
+    senderParam: Address;
+    senderParamId: number;
+    solutionCode: string;
+    sortCode: string;
+    trackingNumber: string;
+    updatedAt: string;
+    userSortCode: string;
+  }[];
+  page: number
+  pageSize: number
+}
+
+export interface LogisticsQuery extends ListQuery {
+  orderCode?: string
+  solutionCode?: string
 }

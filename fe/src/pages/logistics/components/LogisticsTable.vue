@@ -5,7 +5,7 @@
         <template #label> 全部 </template>
       </t-tab-panel>
       <t-tab-panel value="pending">
-        <template #label> 代发货 </template>
+        <template #label> 待发货 </template>
       </t-tab-panel>
       <t-tab-panel value="transport">
         <template #label> 运送中 </template>
@@ -31,28 +31,28 @@
           <t-col :span="10">
             <t-row :gutter="[16, 24]">
               <t-col :span="3">
-                <t-form-item name="name">
+                <t-form-item name="orderCode">
                   <t-input-adornment
-                    prepend="国际运单号"
+                    prepend="物流订单号"
                     class="form-item-content"
                     :style="{ minWidth: '134px', width: '100%' }"
                   >
-                    <t-input v-model="formData.name" type="search" clearable placeholder="请输入国际运单号" />
+                    <t-input v-model="formData.orderCode" type="search" clearable placeholder="请输入物流订单号" />
                   </t-input-adornment>
                 </t-form-item>
               </t-col>
               <t-col :span="3">
-                <t-form-item name="status">
+                <t-form-item name="solutionCode">
                   <t-select
-                    v-model="formData.status"
+                    v-model="formData.solutionCode"
                     class="form-item-content"
-                    :options="CONTRACT_STATUS_OPTIONS"
+                    :options="SolutionMap"
                     placeholder="物流方案"
                     clearable
                   />
                 </t-form-item>
               </t-col>
-              <t-col :span="3">
+              <!-- <t-col :span="3">
                 <t-form-item name="no">
                   <t-input
                     v-model="formData.no"
@@ -61,7 +61,7 @@
                     :style="{ minWidth: '134px' }"
                   />
                 </t-form-item>
-              </t-col>
+              </t-col> -->
             </t-row>
           </t-col>
 
@@ -118,7 +118,8 @@ import { getLogistics, cancel } from '@/api/logistics';
 import { useSettingStore } from '@/store';
 import { prefix } from '@/config/global';
 
-import { CONTRACT_STATUS_OPTIONS } from '@/constants';
+import { getSolutionMap } from '@/api/common';
+import { MapItem } from '@/api/model/commonModel';
 
 const store = useSettingStore();
 const router = useRouter();
@@ -127,14 +128,32 @@ const COLUMNS: PrimaryTableCol<TableRowData>[] = [
   {
     title: '物流订单号',
     fixed: 'left',
-    width: 200,
+    width: 180,
     ellipsis: true,
     align: 'left',
     colKey: 'orderCode',
   },
   {
+    title: '末公里运单号',
+    width: 280,
+    ellipsis: true,
+    align: 'left',
+    colKey: 'trackingNumber',
+  },
+  {
+    title: '收件人',
+    ellipsis: true,
+    align: 'left',
+    colKey: 'receiverParam.name',
+  },
+  // {
+  //   title: '收件地址',
+  //   ellipsis: true,
+  //   align: 'left',
+  //   colKey: 'receiverParam.detailAddress',
+  // },
+  {
     title: '创建时间',
-    fixed: 'left',
     width: 200,
     ellipsis: true,
     align: 'left',
@@ -150,10 +169,8 @@ const COLUMNS: PrimaryTableCol<TableRowData>[] = [
 ];
 
 const searchForm = {
-  name: '',
-  no: undefined,
-  status: undefined,
-  type: '',
+  orderCode: undefined,
+  solutionCode: undefined,
 };
 
 const formData = ref({ ...searchForm });
@@ -162,9 +179,9 @@ const verticalAlign = 'top' as const;
 const hover = true;
 
 const pagination = ref({
-  defaultPageSize: 20,
+  pageSize: 20,
   total: 100,
-  defaultCurrent: 1,
+  current: 1
 });
 const confirmVisible = ref(false);
 
@@ -174,14 +191,21 @@ const dataLoading = ref(false);
 const fetchData = async () => {
   dataLoading.value = true;
   try {
-    const { data: list } = await getLogistics();
-    data.value = list;
+    const { data: list } = await getLogistics({
+      page: pagination.value.current,
+      pageSize: pagination.value.pageSize,
+      orderCode: formData.value.orderCode,
+      solutionCode: formData.value.solutionCode
+    });
+    data.value = list.rows;
     pagination.value = {
-      ...pagination.value,
-      total: list.length,
+      current: list.page,
+      pageSize: list.pageSize,
+      total: list.count,
     };
   } catch (e) {
     console.log(e);
+    dataLoading.value = false;
   } finally {
     dataLoading.value = false;
   }
@@ -254,6 +278,18 @@ const handleTabChange = (tab: Tabs) => {
 const handleNewLogistics = () => {
   router.push('/logistics/edit');
 };
+
+const SolutionMap: Ref<MapItem[]> = ref([])
+const handleGetSolution = () => {
+  getSolutionMap()
+    .then(result => {
+      SolutionMap.value = result.data
+    })
+}
+
+onMounted(() => {
+  handleGetSolution()
+})
 </script>
 
 <style lang="less" scoped>

@@ -67,21 +67,3 @@ export const LogisticsData = {
   receiverParam: cloneDeep(Address),
   returnerParam: cloneDeep(Address),
 };
-
-export const TYPE_OPTIONS = [
-  { label: '类型A', value: '1' },
-  { label: '类型B', value: '2' },
-  { label: '类型C', value: '3' },
-];
-
-export const PARTY_A_OPTIONS = [
-  { label: '公司A', value: '1' },
-  { label: '公司B', value: '2' },
-  { label: '公司C', value: '3' },
-];
-
-export const PARTY_B_OPTIONS = [
-  { label: '公司A', value: '1' },
-  { label: '公司B', value: '2' },
-  { label: '公司C', value: '3' },
-];

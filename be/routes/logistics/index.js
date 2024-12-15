@@ -3,6 +3,7 @@ const cainiaoConfig = require('../../config')
 const crypto = require('crypto')
 const Logistics = require('../../models/Logistics.model.js')
 const Address = require('../../models/Address.model.js')
+const { Op } = require("sequelize")
 
 function md5(content, keys, charset = 'utf-8') {
   let sign = null;
@@ -170,21 +171,41 @@ module.exports = async function (
     url: '/list',
     method: 'get',
     handler: async (request, reply) => {
-      const params = request.params
-      request.log.info({ params })
+      const query = request.query
+      request.log.info({ query })
 
-      const LogisticsData = await Logistics.findAll({
+      const page = query.page ? Number(query.page) : 1
+      const pageSize = query.pageSize ? Number(query.pageSize) : 20
+
+      const where = {}
+
+      if (query.orderCode) {
+        where.orderCode = { [Op.eq]: query.orderCode }
+      }
+      if (query.solutionCode) {
+        where.solutionCode = { [Op.eq]: query.solutionCode }
+      }
+
+      const LogisticsData = await Logistics.findAndCountAll({
+        where,
         include: [
           { model: Address, as: 'senderParam' },
           { model: Address, as: 'doorPickupParam' },
           { model: Address, as: 'receiverParam' },
           { model: Address, as: 'returnerParam' },
-        ]
+        ],
+        limit: pageSize,
+        offset: pageSize * (page - 1),
+        order: [ [ 'createdAt', 'DESC' ]]
       })
 
       reply.send({
         code: 0,
-        data: LogisticsData,
+        data: {
+          ...LogisticsData,
+          page,
+          pageSize
+        },
         message: 'success'
       })
     }
@@ -257,6 +278,67 @@ module.exports = async function (
     handler: (request, reply) => {
       const body = request.body
       request.log.info({ cainiaoCALLBACK: body })
+    }
+  })
+
+  fastify.route({
+    url: '/track',
+    method: 'get',
+    schema: {
+      query: S.object()
+        .prop("orderCode", S.string()) // 物流订单号
+        .required()
+    },
+    handler: async (request, reply) => {
+      const body = request.query
+
+      const logistics_interface = {
+        orderCode: body.orderCode,
+        locale: 'zh_CN',
+        onlyOfficialNode: true
+      }
+
+      request.log.info({ cainiaoEnv: cainiaoConfig })
+
+      const data_digest = md5(JSON.stringify(logistics_interface), cainiaoConfig.appSecret)
+
+      const reqData = {
+        logistic_provider_id: cainiaoConfig.logistic_provider_id,
+        msg_type: 'cnge.track.get',
+        to_code: 'TRACK',
+        data_digest,
+        logistics_interface: JSON.stringify(logistics_interface)
+      }
+
+      const url = cainiaoConfig.url
+      const { status, data } = await fastify.axios.post(url, { ...reqData }, {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        }
+      })
+
+      if (status !== 200) {
+        reply.send({
+          code: -1,
+          data: null,
+          message: '第三方服务调用失败'
+        })
+      }
+
+      if (data && data.data && data?.success === 'true') {
+        reply.send({
+          code: 0,
+          data: data.data,
+          message: 'Success'
+        })
+      } else {
+        request.log.error({ 'CancelLogisticsError': data })
+        reply.send({
+          code: -1,
+          data: null,
+          message: `errorCode: ${data.errorCode} errorMsg: ${data.errorMsg}`
+        })
+      }
     }
   })
 };
