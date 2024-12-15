@@ -94,16 +94,16 @@
         >
           <template #createdAt="{ col, row }"> {{ dayjs(row[col.colKey]).format('YYYY-MM-DD HH:mm:ss') }} </template>
           <template #op="slotProps">
-            <a class="t-button-link" @click="rehandleClickOp(slotProps)">管理</a>
-            <a class="t-button-link" @click="handleClickDelete(slotProps)">删除</a>
+            <!-- <a class="t-button-link" @click="rehandleClickOp(slotProps)">管理</a> -->
+            <a class="t-button-link" @click="handleCancel(slotProps)">取消订单</a>
           </template>
         </t-table>
         <t-dialog
           v-model:visible="confirmVisible"
-          header="确认删除当前所选合同？"
-          :body="confirmBody"
+          header="Warn"
+          :body="`确认取消当前所选物流单吗？`"
           :on-cancel="onCancel"
-          @confirm="onConfirmDelete"
+          @confirm="onConfirmCancel"
         />
       </div>
     </div>
@@ -114,7 +114,7 @@ import { ref, computed, onMounted, Ref } from 'vue';
 import { MessagePlugin, PrimaryTableCol, TableRowData, PageInfo } from 'tdesign-vue-next';
 import { useRouter } from 'vue-router';
 import dayjs from 'dayjs';
-import { getLogistics } from '@/api/logistics';
+import { getLogistics, cancel } from '@/api/logistics';
 import { useSettingStore } from '@/store';
 import { prefix } from '@/config/global';
 
@@ -175,7 +175,6 @@ const fetchData = async () => {
   dataLoading.value = true;
   try {
     const { data: list } = await getLogistics();
-    console.log(list);
     data.value = list;
     pagination.value = {
       ...pagination.value,
@@ -188,25 +187,21 @@ const fetchData = async () => {
   }
 };
 
-const deleteIdx = ref(-1);
-const confirmBody = computed(() => {
-  if (deleteIdx.value > -1) {
-    const { name } = data.value[deleteIdx.value];
-    return `删除后，${name}的所有合同信息将被清空，且无法恢复`;
-  }
-  return '';
-});
-
 const resetIdx = () => {
-  deleteIdx.value = -1;
+  cancelOrderCode.value = undefined
 };
 
-const onConfirmDelete = () => {
-  // 真实业务请发起请求
-  data.value.splice(deleteIdx.value, 1);
-  pagination.value.total = data.value.length;
-  confirmVisible.value = false;
-  MessagePlugin.success('删除成功');
+const onConfirmCancel = async () => {
+  try {
+    const orderCode = cancelOrderCode.value
+    const result = await cancel({ orderCode })
+    if (result.code === 0) {
+      MessagePlugin.success('Success!');
+    }
+  } catch (err) {}
+  finally {
+    confirmVisible.value = false;
+  }
   resetIdx();
 };
 
@@ -218,14 +213,18 @@ onMounted(() => {
   fetchData();
 });
 
-const handleClickDelete = ({ row }) => {
-  deleteIdx.value = row.rowIndex;
+const cancelOrderCode = ref()
+const handleCancel = ({ row }) => {
+  cancelOrderCode.value = row.orderCode;
   confirmVisible.value = true;
 };
 const onReset = (val) => {
   console.log(val);
 };
 const onSubmit = (val) => {
+  if (val.validateResult) {
+    fetchData()
+  }
   console.log(val);
 };
 const rehandlePageChange = (pageInfo: PageInfo, newDataSource: TableRowData[]) => {

@@ -24,3 +24,5 @@ pnpm-lock.yaml
 
 .history
 data/
+
+config.js

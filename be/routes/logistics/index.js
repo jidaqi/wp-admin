@@ -36,6 +36,8 @@ module.exports = async function (
   fastify,
   opts
 ) {
+
+  // 创建物流单
   fastify.route({
     method: "post",
     url: "/add",
@@ -99,7 +101,6 @@ module.exports = async function (
       const reqData = {
         logistic_provider_id: cainiaoConfig.logistic_provider_id,
         msg_type: 'cnge.order.create',
-        from_code: 'SANDBOX477847',
         to_code: 'CNGCP-OPEN',
         data_digest,
         logistics_interface: JSON.stringify(logistics_interface)
@@ -164,6 +165,7 @@ module.exports = async function (
     },
   });
 
+  // 查询物流单列表
   fastify.route({
     url: '/list',
     method: 'get',
@@ -185,6 +187,67 @@ module.exports = async function (
         data: LogisticsData,
         message: 'success'
       })
+    }
+  })
+
+  // 取消物流单
+  fastify.route({
+    method: 'post',
+    url: '/cancel',
+    schema: {
+      body: S.object()
+        .prop("orderCode", S.string()) // 物流订单号
+        .required()
+    },
+    handler: async (request, reply) => {
+      const body = request.body
+
+      const logistics_interface = {
+        orderCode: body.orderCode,
+        locale: 'zh_CN'
+      }
+
+      request.log.info({ cainiaoEnv: cainiaoConfig })
+
+      const data_digest = md5(JSON.stringify(logistics_interface), cainiaoConfig.appSecret)
+
+      const reqData = {
+        logistic_provider_id: cainiaoConfig.logistic_provider_id,
+        msg_type: 'cnge.order.cancel',
+        to_code: 'CNGCP-OPEN',
+        data_digest,
+        logistics_interface: JSON.stringify(logistics_interface)
+      }
+
+      const url = cainiaoConfig.url
+      const { status, data } = await fastify.axios.post(url, { ...reqData }, {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        }
+      })
+
+      if (status !== 200) {
+        reply.send({
+          code: -1,
+          data: null,
+          message: '第三方服务调用失败'
+        })
+      }
+
+      if (data && data?.success === 'true') {
+        reply.send({
+          code: 0,
+          data: null,
+          message: '取消成功'
+        })
+      } else {
+        request.log.error({ 'CancelLogisticsError': data })
+        reply.send({
+          code: -1,
+          data: null,
+          message: `errorCode: ${data.errorCode} errorMsg: ${data.errorMsg}`
+        })
+      }
     }
   })
 };
