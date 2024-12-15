@@ -1,7 +1,6 @@
 const S = require('fluent-json-schema')
-const { dev, prod } = require('../../config')
+const cainiaoConfig = require('../../config')
 const crypto = require('crypto')
-const { URLSearchParams } = require('url')
 const Logistics = require('../../models/Logistics.model.js')
 const Address = require('../../models/Address.model.js')
 
@@ -93,10 +92,12 @@ module.exports = async function (
         ...body
       }
 
-      const data_digest = md5(JSON.stringify(logistics_interface), prod.appSecret)
+      request.log.info({ cainiaoEnv: cainiaoConfig })
+
+      const data_digest = md5(JSON.stringify(logistics_interface), cainiaoConfig.appSecret)
 
       const reqData = {
-        logistic_provider_id: prod.logistic_provider_id,
+        logistic_provider_id: cainiaoConfig.logistic_provider_id,
         msg_type: 'cnge.order.create',
         from_code: 'SANDBOX477847',
         to_code: 'CNGCP-OPEN',
@@ -104,7 +105,7 @@ module.exports = async function (
         logistics_interface: JSON.stringify(logistics_interface)
       }
 
-      const url = prod.url
+      const url = cainiaoConfig.url
       const { status, data } = await fastify.axios.post(url, { ...reqData }, {
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded'
