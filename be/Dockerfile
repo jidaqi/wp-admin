@@ -6,7 +6,7 @@ COPY package.json .
 
 RUN npm i nodemon -g
 
-RUN npm i
+RUN yarn
 
 COPY . .
 
