@@ -90,7 +90,6 @@
           :loading="dataLoading"
           :header-affixed-top="headerAffixedTop"
           @page-change="rehandlePageChange"
-          @change="rehandleChange"
         >
           <template #createdAt="{ col, row }"> {{ dayjs(row[col.colKey]).format('YYYY-MM-DD HH:mm:ss') }} </template>
           <template #op="slotProps">
@@ -181,7 +180,7 @@ const hover = true;
 const pagination = ref({
   pageSize: 20,
   total: 100,
-  current: 1
+  current: 1,
 });
 const confirmVisible = ref(false);
 
@@ -195,7 +194,7 @@ const fetchData = async () => {
       page: pagination.value.current,
       pageSize: pagination.value.pageSize,
       orderCode: formData.value.orderCode,
-      solutionCode: formData.value.solutionCode
+      solutionCode: formData.value.solutionCode,
     });
     data.value = list.rows;
     pagination.value = {
@@ -212,18 +211,18 @@ const fetchData = async () => {
 };
 
 const resetIdx = () => {
-  cancelOrderCode.value = undefined
+  cancelOrderCode.value = undefined;
 };
 
 const onConfirmCancel = async () => {
   try {
-    const orderCode = cancelOrderCode.value
-    const result = await cancel({ orderCode })
+    const orderCode = cancelOrderCode.value;
+    const result = await cancel({ orderCode });
     if (result.code === 0) {
       MessagePlugin.success('Success!');
     }
-  } catch (err) {}
-  finally {
+  } catch (err) {
+  } finally {
     confirmVisible.value = false;
   }
   resetIdx();
@@ -233,11 +232,7 @@ const onCancel = () => {
   resetIdx();
 };
 
-onMounted(() => {
-  fetchData();
-});
-
-const cancelOrderCode = ref()
+const cancelOrderCode = ref();
 const handleCancel = ({ row }) => {
   cancelOrderCode.value = row.orderCode;
   confirmVisible.value = true;
@@ -247,15 +242,14 @@ const onReset = (val) => {
 };
 const onSubmit = (val) => {
   if (val.validateResult) {
-    fetchData()
+    fetchData();
   }
   console.log(val);
 };
 const rehandlePageChange = (pageInfo: PageInfo, newDataSource: TableRowData[]) => {
-  console.log('分页变化', pageInfo, newDataSource);
-};
-const rehandleChange = (changeParams, triggerAndData) => {
-  console.log('统一Change', changeParams, triggerAndData);
+  pagination.value.current = pageInfo.current
+  pagination.value.pageSize = pageInfo.pageSize
+  fetchData();
 };
 const rehandleClickOp = ({ text, row }) => {
   console.log(text, row);
@@ -279,17 +273,17 @@ const handleNewLogistics = () => {
   router.push('/logistics/edit');
 };
 
-const SolutionMap: Ref<MapItem[]> = ref([])
+const SolutionMap: Ref<MapItem[]> = ref([]);
 const handleGetSolution = () => {
-  getSolutionMap()
-    .then(result => {
-      SolutionMap.value = result.data
-    })
-}
+  getSolutionMap().then((result) => {
+    SolutionMap.value = result.data;
+  });
+};
 
 onMounted(() => {
-  handleGetSolution()
-})
+  fetchData();
+  handleGetSolution();
+});
 </script>
 
 <style lang="less" scoped>
