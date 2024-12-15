@@ -4,10 +4,10 @@ WORKDIR /app
 
 COPY package.json .
 
-RUN yarn add global nodemon
+RUN npm i nodemon -g
 
-RUN yarn
+RUN npm i
 
 COPY . .
 
-CMD ["yarn", "start:watch"]
+CMD ["npm", "start:watch"]
