@@ -26,11 +26,11 @@ services:
         build: ./be
         ports:
             - "3000:3000"
-        volumes:
-            - type: bind
-              source: ./be
-              target: /app
-              consistency: native
+        # volumes:
+        #     - type: bind
+        #       source: ./be
+        #       target: /app
+        #       consistency: native
         networks:
             - default
     db:
