@@ -10,4 +10,4 @@ RUN npm i
 
 COPY . .
 
-CMD ["npm", "start:watch"]
+CMD ["npm", "run watch"]

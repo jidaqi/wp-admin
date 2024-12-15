@@ -10,7 +10,7 @@
     "test": "node --test test/**/*.test.js",
     "start": "fastify start -l info app.js",
     "dev": "fastify start -w -l info -P app.js",
-    "start:watch": "nodemon -L server.js"
+    "watch": "nodemon -L server.js"
   },
   "keywords": [],
   "author": "",
