@@ -222,6 +222,7 @@ const onConfirmCancel = async () => {
       MessagePlugin.success('Success!');
     }
   } catch (err) {
+    console.log(err);
   } finally {
     confirmVisible.value = false;
   }
@@ -246,13 +247,10 @@ const onSubmit = (val) => {
   }
   console.log(val);
 };
-const rehandlePageChange = (pageInfo: PageInfo, newDataSource: TableRowData[]) => {
-  pagination.value.current = pageInfo.current
-  pagination.value.pageSize = pageInfo.pageSize
+const rehandlePageChange = (pageInfo: PageInfo) => {
+  pagination.value.current = pageInfo.current;
+  pagination.value.pageSize = pageInfo.pageSize;
   fetchData();
-};
-const rehandleClickOp = ({ text, row }) => {
-  console.log(text, row);
 };
 
 const headerAffixedTop = computed(

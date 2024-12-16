@@ -1,4 +1,4 @@
-import { ListQuery } from "./commonModel";
+import { ListQuery } from './commonModel';
 
 /*
  * @Author: Peihua
@@ -61,11 +61,11 @@ export interface LogisticsList {
     updatedAt: string;
     userSortCode: string;
   }[];
-  page: number
-  pageSize: number
+  page: number;
+  pageSize: number;
 }
 
 export interface LogisticsQuery extends ListQuery {
-  orderCode?: string
-  solutionCode?: string
+  orderCode?: string;
+  solutionCode?: string;
 }

@@ -3,11 +3,11 @@ import { Result } from '@/types/axios';
 import { MapItem } from './model/commonModel';
 
 const Api = {
-  solution: '/common/solution'
-}
+  solution: '/common/solution',
+};
 
 export function getSolutionMap(): Promise<Result<MapItem[]>> {
   return request.get({
     url: Api.solution,
-  })
+  });
 }

@@ -25,10 +25,10 @@
             :value="currentPackage"
             theme="normal"
             :addable="true"
+            style="width: 100%"
             @add="() => formData.packageParams.push({ weight: 0, itemParams: [cloneDeep(defaultItemParam)] })"
             @remove="({ index }) => formData.packageParams.splice(index, 1)"
             @change="(value) => (currentPackage = value)"
-            style="width: 100%"
           >
             <t-tab-panel
               v-for="(_package, packageIndex) in formData.packageParams"
@@ -300,9 +300,9 @@ export default {
 import { Ref, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { MessagePlugin, LoadingPlugin } from 'tdesign-vue-next';
+import { cloneDeep } from 'lodash-es';
 import { FORM_RULES, LogisticsData, defaultItemParam } from './constants';
 import { addLogistics } from '@/api/logistics';
-import { cloneDeep } from 'lodash-es';
 
 const router = useRouter();
 

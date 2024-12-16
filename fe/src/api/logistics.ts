@@ -26,7 +26,7 @@ export function addLogistics(data: LogisticsBody): Promise<Result<LogisticsList>
 export function getLogistics(query: LogisticsQuery): Promise<Result> {
   return request.get({
     url: Api.List,
-    params: query
+    params: query,
   });
 }
 
