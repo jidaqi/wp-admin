@@ -2,7 +2,7 @@
  * @Author: Peihua
  * @Date: 2024-12-08 23:32:11
  * @LastEditors: Peihua
- * @LastEditTime: 2024-12-15 12:20:56
+ * @LastEditTime: 2024-12-16 09:38:56
  * @FilePath: \fe\src\config\proxy.ts
  * @Description:
  */
@@ -22,7 +22,7 @@ export default {
   },
   release: {
     // 正式环境接口地址
-    host: 'https://service-bv448zsw-1257786608.gz.apigw.tencentcs.com',
+    host: 'https://api-admin.hanyial.com',
     // 正式环境 cdn 路径
     cdn: '',
   },

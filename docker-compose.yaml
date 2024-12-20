@@ -13,6 +13,7 @@ services:
             - ./nginx/conf/default.conf:/etc/nginx/default.conf:ro
             - ./certbot/www:/var/www/certbot/:ro
             - ./certbot/conf/:/etc/nginx/ssl/:ro
+            - ./web:/web
         networks:
             - default
     certbot:
@@ -28,11 +29,6 @@ services:
             - "3000:3000"
         volumes:
             - ./be/logs:/app/logs
-        # volumes:
-        #     - type: bind
-        #       source: ./be
-        #       target: /app
-        #       consistency: native
         networks:
             - default
     db:
@@ -48,6 +44,9 @@ services:
             - ./my.cnf:/etc/mysql/conf.d/my.cnf
         networks:
             - default
+    
+    web:
+        build: ./fe
 
 networks:
     default:
