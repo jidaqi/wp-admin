@@ -2,7 +2,7 @@
  * @Author: Peihua
  * @Date: 2024-12-08 23:25:11
  * @LastEditors: Peihua
- * @LastEditTime: 2024-12-14 23:30:24
+ * @LastEditTime: 2024-12-20 14:19:42
  * @FilePath: \be\app.js
  * @Description: 
  */
@@ -22,7 +22,7 @@ module.exports = async function (fastify, opts) {
   // Do not touch the following lines
 
   fastify.register(cors, {
-    origin: ['http://localhost:3002'],
+    origin: ['http://localhost:3002', 'https://admin.hanyial.com/', 'http://admin.hanyial.com/'],
     methods: ['GET', 'PUT', 'PATCH', 'POST', 'DELETE'],
     credentials: true // 允许携带凭证
   })
