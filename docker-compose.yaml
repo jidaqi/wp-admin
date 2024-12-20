@@ -44,9 +44,6 @@ services:
             - ./my.cnf:/etc/mysql/conf.d/my.cnf
         networks:
             - default
-    
-    web:
-        build: ./fe
 
 networks:
     default:
