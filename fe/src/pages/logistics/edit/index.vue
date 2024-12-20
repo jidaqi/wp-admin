@@ -332,6 +332,10 @@ const onSubmit = ({ validateResult }) => {
       console.log(result);
       if (result.code === 0) {
         MessagePlugin.success(result.message);
+        formData.value = {
+          ...LogisticsData
+        }
+        onReset()
       }
     })
     .catch(() => {

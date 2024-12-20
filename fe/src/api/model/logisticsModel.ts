@@ -4,7 +4,7 @@ import { ListQuery } from './commonModel';
  * @Author: Peihua
  * @Date: 2024-12-09 13:28:28
  * @LastEditors: Peihua
- * @LastEditTime: 2024-12-15 20:46:27
+ * @LastEditTime: 2024-12-20 14:41:28
  * @FilePath: \fe\src\api\model\logisticsModel.ts
  * @Description: 物流接口类型定义
  */
@@ -68,4 +68,19 @@ export interface LogisticsList {
 export interface LogisticsQuery extends ListQuery {
   orderCode?: string;
   solutionCode?: string;
+}
+
+export interface TrackResultData {
+  traceDetailList: {
+    actionCode: string;
+    desc: string;
+    location: string;
+    locationDetail: { zipCode: string };
+    zipCode: string;
+    mergeDescription: string;
+    opCode: string;
+    opCodeDesc: string;
+    time: string;
+    timeZone: string;
+  }[];
 }

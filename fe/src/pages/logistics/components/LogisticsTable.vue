@@ -94,6 +94,7 @@
           <template #createdAt="{ col, row }"> {{ dayjs(row[col.colKey]).format('YYYY-MM-DD HH:mm:ss') }} </template>
           <template #op="slotProps">
             <!-- <a class="t-button-link" @click="rehandleClickOp(slotProps)">管理</a> -->
+            <a class="t-button-link" @click="handleGetTrack(slotProps)">查看物流轨迹</a>
             <a class="t-button-link" @click="handleCancel(slotProps)">取消订单</a>
           </template>
         </t-table>
@@ -113,7 +114,7 @@ import { ref, computed, onMounted, Ref } from 'vue';
 import { MessagePlugin, PrimaryTableCol, TableRowData, PageInfo } from 'tdesign-vue-next';
 import { useRouter } from 'vue-router';
 import dayjs from 'dayjs';
-import { getLogistics, cancel } from '@/api/logistics';
+import { getLogistics, cancel, track } from '@/api/logistics';
 import { useSettingStore } from '@/store';
 import { prefix } from '@/config/global';
 
@@ -276,6 +277,19 @@ const handleGetSolution = () => {
   getSolutionMap().then((result) => {
     SolutionMap.value = result.data;
   });
+};
+
+const handleGetTrack = ({ row }) => {
+  dataLoading.value = true;
+  const orderCode = row.orderCode;
+  track({ orderCode })
+    .then((result) => {
+      dataLoading.value = false;
+      console.log(result);
+    })
+    .catch(() => {
+      dataLoading.value = false;
+    });
 };
 
 onMounted(() => {

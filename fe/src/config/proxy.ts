@@ -2,7 +2,7 @@
  * @Author: Peihua
  * @Date: 2024-12-08 23:32:11
  * @LastEditors: Peihua
- * @LastEditTime: 2024-12-16 09:38:56
+ * @LastEditTime: 2024-12-20 14:39:15
  * @FilePath: \fe\src\config\proxy.ts
  * @Description:
  */
@@ -10,7 +10,8 @@ export default {
   isRequestProxy: true,
   development: {
     // 开发环境接口请求
-    host: 'http://localhost:3000',
+    // host: 'http://localhost:3000',
+    host: 'https://api-admin.hanyial.com',
     // 开发环境 cdn 路径
     cdn: '',
   },
