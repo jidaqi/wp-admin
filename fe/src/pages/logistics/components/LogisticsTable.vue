@@ -107,6 +107,8 @@
         />
       </div>
     </div>
+
+    <TrackDrawer ref="trackDrawerRef" />
   </div>
 </template>
 <script setup lang="ts">
@@ -120,6 +122,8 @@ import { prefix } from '@/config/global';
 
 import { getSolutionMap } from '@/api/common';
 import { MapItem } from '@/api/model/commonModel';
+
+import TrackDrawer from './TrackDrawer.vue';
 
 const store = useSettingStore();
 const router = useRouter();
@@ -145,13 +149,15 @@ const COLUMNS: PrimaryTableCol<TableRowData>[] = [
     ellipsis: true,
     align: 'left',
     colKey: 'receiverParam.name',
+    width: 130,
   },
-  // {
-  //   title: '收件地址',
-  //   ellipsis: true,
-  //   align: 'left',
-  //   colKey: 'receiverParam.detailAddress',
-  // },
+  {
+    title: '收件地址',
+    ellipsis: true,
+    align: 'left',
+    colKey: 'receiverParam.detailAddress',
+    width: 380
+  },
   {
     title: '创建时间',
     width: 200,
@@ -269,7 +275,8 @@ const handleTabChange = (tab: Tabs) => {
 };
 
 const handleNewLogistics = () => {
-  router.push('/logistics/edit');
+  // router.push('/logistics/edit');
+  window.open(location.origin + '/#/logistics/edit', '_blank')
 };
 
 const SolutionMap: Ref<MapItem[]> = ref([]);
@@ -279,13 +286,16 @@ const handleGetSolution = () => {
   });
 };
 
+const trackDrawerRef = ref();
 const handleGetTrack = ({ row }) => {
   dataLoading.value = true;
   const orderCode = row.orderCode;
   track({ orderCode })
     .then((result) => {
       dataLoading.value = false;
-      console.log(result);
+      if (result.code === 0) {
+        trackDrawerRef.value.handleShow(orderCode, result.data.traceDetailList);
+      }
     })
     .catch(() => {
       dataLoading.value = false;

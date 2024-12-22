@@ -108,10 +108,17 @@
           </t-tabs>
         </t-row>
 
-        <div class="form-basic-container-title form-title-gap">揽收信息</div>
+        <div class="form-basic-container-title form-title-gap">
+          揽收信息
+        </div>
+
+        <div class="form-basic-container-setting">
+          使用默认设置
+          <t-switch size="medium" v-model="defaultSolutionParam"></t-switch>
+        </div>
 
         <!-- 发件人信息 -->
-        <t-row class="row-gap" :gutter="[16, 24]">
+        <t-row class="row-gap" :gutter="[16, 24]" v-if="!defaultSolutionParam">
           <t-col :span="6">
             <t-form-item label="姓名">
               <t-input v-model="formData.solutionParam.doorPickupParam.name"></t-input>
@@ -156,8 +163,13 @@
 
         <div class="form-basic-container-title form-title-gap">发件人信息</div>
 
+        <div class="form-basic-container-setting">
+          使用默认设置
+          <t-switch size="medium" v-model="defaultSenderParam"></t-switch>
+        </div>
+
         <!-- 发件人信息 -->
-        <t-row class="row-gap" :gutter="[16, 24]">
+        <t-row class="row-gap" :gutter="[16, 24]" v-if="!defaultSenderParam">
           <t-col :span="6">
             <t-form-item label="姓名">
               <t-input v-model="formData.senderParam.name"></t-input>
@@ -197,7 +209,7 @@
 
         <div class="form-basic-container-title form-title-gap">收件人信息</div>
 
-        <!-- 发件人信息 -->
+        <!-- 收件人信息 -->
         <t-row class="row-gap" :gutter="[16, 24]">
           <t-col :span="6">
             <t-form-item label="姓名">
@@ -238,8 +250,13 @@
 
         <div class="form-basic-container-title form-title-gap">退件人信息</div>
 
-        <!-- 发件人信息 -->
-        <t-row class="row-gap" :gutter="[16, 24]">
+        <div class="form-basic-container-setting">
+          使用默认设置
+          <t-switch size="medium" v-model="defaultReturnerParam"></t-switch>
+        </div>
+
+        <!-- 退件人信息 -->
+        <t-row class="row-gap" :gutter="[16, 24]" v-if="!defaultReturnerParam">
           <t-col :span="6">
             <t-form-item label="姓名">
               <t-input v-model="formData.returnerParam.name"></t-input>
@@ -283,7 +300,7 @@
       <div class="form-submit-sub">
         <div class="form-submit-left">
           <t-button theme="primary" class="form-submit-confirm" type="submit"> 提交 </t-button>
-          <t-button type="reset" class="form-submit-cancel" theme="default" variant="base"> 返回 </t-button>
+          <!-- <t-button type="reset" class="form-submit-cancel" theme="default" variant="base"> 返回 </t-button> -->
         </div>
       </div>
     </div>
@@ -308,6 +325,10 @@ const router = useRouter();
 
 const form = ref();
 const formData = ref({ ...LogisticsData });
+
+const defaultSolutionParam = ref(true)
+const defaultSenderParam = ref(true)
+const defaultReturnerParam = ref(true)
 
 const currentPackage: Ref<number | string> = ref(0);
 

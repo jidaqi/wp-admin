@@ -4,7 +4,7 @@
       <template #logo>
         <span v-if="showLogo" :class="`${prefix}-side-nav-logo-wrapper`" @click="goHome">
           <!-- <component :is="getLogo()" :class="`${prefix}-side-nav-logo-${collapsed ? 't' : 'tdesign'}-logo`" /> -->
-          <h1>Hanyial Admin</h1>
+          <h1 style="margin: 0 12px;">Hanyial Admin</h1>
         </span>
       </template>
       <menu-content :nav-data="menu" />

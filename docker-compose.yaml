@@ -23,14 +23,6 @@ services:
             - ./certbot/conf/:/etc/letsencrypt/:rw
         networks:
             - default
-    fastify:
-        build: ./be
-        ports:
-            - "3000:3000"
-        volumes:
-            - ./be/logs:/app/logs
-        networks:
-            - default
     db:
         image: mysql:5.7
         restart: always
@@ -42,6 +34,19 @@ services:
         volumes:
             - ./data/database:/var/lib/mysql
             - ./my.cnf:/etc/mysql/conf.d/my.cnf
+        networks:
+            - default
+
+    fastify:
+        depends_on:
+            - db
+        build: ./be
+        ports:
+            - "3000:3000"
+        volumes:
+            - ./be/logs:/app/logs
+            - ./be/routes:/app/routes
+            - ./be/plugins:/app/plugins
         networks:
             - default
 

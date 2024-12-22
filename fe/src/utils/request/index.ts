@@ -7,6 +7,8 @@ import { VAxios } from './Axios';
 import proxy from '@/config/proxy';
 import { joinTimestamp, formatRequestDate, setObjToUrlParams } from './utils';
 import { TOKEN_NAME } from '@/config/global';
+import { getUserStore, useUserStore } from '@/store';
+import { useRouter } from 'vue-router';
 
 const env = import.meta.env.MODE || 'development';
 
@@ -113,8 +115,9 @@ const transform: AxiosTransform = {
 
   // 请求拦截器处理
   requestInterceptors: (config, options) => {
+    const userStore = useUserStore();
     // 请求之前处理config
-    const token = localStorage.getItem(TOKEN_NAME);
+    const token = userStore.token;
     if (token && (config as Recordable)?.requestOptions?.withToken !== false) {
       // jwt token
       (config as Recordable).headers.Authorization = options.authenticationScheme
@@ -131,7 +134,18 @@ const transform: AxiosTransform = {
 
   // 响应错误处理
   responseInterceptorsCatch: (error: any) => {
-    const { config } = error;
+    const router = useRouter();
+    const userStore = getUserStore()
+    const { config, response } = error;
+
+    if (response.status === 401) {
+      MessagePlugin.error('登录已过期！');
+      Promise.reject(error);
+
+      userStore.token = undefined
+      location.reload()
+    }
+
     if (!config || !config.requestOptions.retry) return Promise.reject(error);
 
     config.retryCount = config.retryCount || 0;
@@ -163,7 +177,7 @@ function createAxios(opt?: Partial<CreateAxiosOptions>) {
       <CreateAxiosOptions>{
         // https://developer.mozilla.org/en-US/docs/Web/HTTP/Authentication#authentication_schemes
         // 例如: authenticationScheme: 'Bearer'
-        authenticationScheme: '',
+        authenticationScheme: 'Bearer',
         // 超时
         timeout: 10 * 1000,
         // 携带Cookie
