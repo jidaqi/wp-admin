@@ -2,7 +2,7 @@
  * @Author: Peihua
  * @Date: 2024-12-09 18:01:16
  * @LastEditors: Peihua
- * @LastEditTime: 2024-12-15 21:25:41
+ * @LastEditTime: 2024-12-23 00:48:29
  * @FilePath: \fe\src\pages\logistics\edit\constants.ts
  */
 import { FormRule } from 'tdesign-vue-next';
@@ -54,7 +54,7 @@ export const defaultItemParam = {
 
 export const LogisticsData = {
   solutionParam: {
-    solutionCode: 'CN_GLO_EXP',
+    solutionCode: 'CN_GLO_STD',
     doorPickupParam: cloneDeep(Address),
   },
   packageParams: [

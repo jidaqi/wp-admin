@@ -186,7 +186,7 @@ const hover = true;
 
 const pagination = ref({
   pageSize: 20,
-  total: 100,
+  total: 0,
   current: 1,
 });
 const confirmVisible = ref(false);
@@ -283,6 +283,10 @@ const SolutionMap: Ref<MapItem[]> = ref([]);
 const handleGetSolution = () => {
   getSolutionMap().then((result) => {
     SolutionMap.value = result.data;
+
+    formData.value.solutionCode = 'CN_GLO_STD'
+
+    fetchData()
   });
 };
 
@@ -303,7 +307,6 @@ const handleGetTrack = ({ row }) => {
 };
 
 onMounted(() => {
-  fetchData();
   handleGetSolution();
 });
 </script>
