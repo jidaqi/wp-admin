@@ -1,22 +1,5 @@
 <template>
   <div>
-    <t-tabs :value="currentTab" :theme="'normal'" style="padding: 12px 32px" @change="handleTabChange">
-      <t-tab-panel value="all">
-        <template #label> 全部 </template>
-      </t-tab-panel>
-      <t-tab-panel value="pending">
-        <template #label> 待发货 </template>
-      </t-tab-panel>
-      <t-tab-panel value="transport">
-        <template #label> 运送中 </template>
-      </t-tab-panel>
-      <t-tab-panel value="finally">
-        <template #label> 已完成 </template>
-      </t-tab-panel>
-      <t-tab-panel value="warn">
-        <template #label> 异常订单 </template>
-      </t-tab-panel>
-    </t-tabs>
     <div class="list-common-table">
       <t-form
         ref="form"
@@ -29,7 +12,7 @@
       >
         <t-row>
           <t-col :span="10">
-            <t-row :gutter="[16, 24]">
+            <!-- <t-row :gutter="[16, 24]">
               <t-col :span="3">
                 <t-form-item name="orderCode">
                   <t-input-adornment
@@ -41,28 +24,7 @@
                   </t-input-adornment>
                 </t-form-item>
               </t-col>
-              <t-col :span="3">
-                <t-form-item name="solutionCode">
-                  <t-select
-                    v-model="formData.solutionCode"
-                    class="form-item-content"
-                    :options="SolutionMap"
-                    placeholder="物流方案"
-                    clearable
-                  />
-                </t-form-item>
-              </t-col>
-              <!-- <t-col :span="3">
-                <t-form-item name="no">
-                  <t-input
-                    v-model="formData.no"
-                    class="form-item-content"
-                    placeholder="物流状态"
-                    :style="{ minWidth: '134px' }"
-                  />
-                </t-form-item>
-              </t-col> -->
-            </t-row>
+            </t-row> -->
           </t-col>
 
           <t-col :span="2" class="operation-container">
@@ -75,7 +37,7 @@
       <div class="table-action">
         <div></div>
         <div class="right">
-          <t-button theme="primary" @click="handleNewLogistics">创建物流单</t-button>
+          <t-button theme="primary" @click="handleNewAccount">新建账号</t-button>
         </div>
       </div>
 
@@ -94,21 +56,10 @@
           <template #createdAt="{ col, row }"> {{ dayjs(row[col.colKey]).format('YYYY-MM-DD HH:mm:ss') }} </template>
           <template #op="slotProps">
             <!-- <a class="t-button-link" @click="rehandleClickOp(slotProps)">管理</a> -->
-            <a class="t-button-link" @click="handleGetTrack(slotProps)">查看物流轨迹</a>
-            <a class="t-button-link" @click="handleCancel(slotProps)">取消订单</a>
           </template>
         </t-table>
-        <t-dialog
-          v-model:visible="confirmVisible"
-          header="Warn"
-          :body="`确认取消当前所选物流单吗？`"
-          :on-cancel="onCancel"
-          @confirm="onConfirmCancel"
-        />
       </div>
     </div>
-
-    <TrackDrawer ref="trackDrawerRef" />
   </div>
 </template>
 <script setup lang="ts">
@@ -116,14 +67,9 @@ import { ref, computed, onMounted, Ref } from 'vue';
 import { MessagePlugin, PrimaryTableCol, TableRowData, PageInfo } from 'tdesign-vue-next';
 import { useRouter } from 'vue-router';
 import dayjs from 'dayjs';
-import { getLogistics, cancel, track } from '@/api/logistics';
+import { getLogistics, cancel } from '@/api/logistics';
 import { useSettingStore } from '@/store';
 import { prefix } from '@/config/global';
-
-import { getSolutionMap } from '@/api/common';
-import { MapItem } from '@/api/model/commonModel';
-
-import TrackDrawer from './TrackDrawer.vue';
 
 const store = useSettingStore();
 
@@ -216,34 +162,6 @@ const fetchData = async () => {
   }
 };
 
-const resetIdx = () => {
-  cancelOrderCode.value = undefined;
-};
-
-const onConfirmCancel = async () => {
-  try {
-    const orderCode = cancelOrderCode.value;
-    const result = await cancel({ orderCode });
-    if (result.code === 0) {
-      MessagePlugin.success('Success!');
-    }
-  } catch (err) {
-    console.log(err);
-  } finally {
-    confirmVisible.value = false;
-  }
-  resetIdx();
-};
-
-const onCancel = () => {
-  resetIdx();
-};
-
-const cancelOrderCode = ref();
-const handleCancel = ({ row }) => {
-  cancelOrderCode.value = row.orderCode;
-  confirmVisible.value = true;
-};
 const onReset = (val) => {
   console.log(val);
 };
@@ -267,47 +185,9 @@ const headerAffixedTop = computed(
     } as any), // TO BE FIXED
 );
 
-type Tabs = 'all' | 'pending' | 'transport' | 'finally' | 'warn';
-const currentTab: Ref<Tabs> = ref('all');
-const handleTabChange = (tab: Tabs) => {
-  currentTab.value = tab;
+const handleNewAccount = () => {
 };
 
-const handleNewLogistics = () => {
-  // router.push('/logistics/edit');
-  window.open(location.origin + '/#/logistics/edit', '_blank');
-};
-
-const SolutionMap: Ref<MapItem[]> = ref([]);
-const handleGetSolution = () => {
-  getSolutionMap().then((result) => {
-    SolutionMap.value = result.data;
-
-    formData.value.solutionCode = 'CN_GLO_STD';
-
-    fetchData();
-  });
-};
-
-const trackDrawerRef = ref();
-const handleGetTrack = ({ row }) => {
-  dataLoading.value = true;
-  const orderCode = row.orderCode;
-  track({ orderCode })
-    .then((result) => {
-      dataLoading.value = false;
-      if (result.code === 0) {
-        trackDrawerRef.value.handleShow(orderCode, result.data.traceDetailList);
-      }
-    })
-    .catch(() => {
-      dataLoading.value = false;
-    });
-};
-
-onMounted(() => {
-  handleGetSolution();
-});
 </script>
 
 <style lang="less" scoped>

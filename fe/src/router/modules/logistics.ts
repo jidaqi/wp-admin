@@ -2,7 +2,7 @@
  * @Author: Peihua
  * @Date: 2024-12-09 11:40:51
  * @LastEditors: Peihua
- * @LastEditTime: 2024-12-23 00:49:43
+ * @LastEditTime: 2024-12-28 23:48:57
  * @FilePath: \fe\src\router\modules\logistics.ts
  * @Description: 物流模块路由配置
  */
@@ -15,19 +15,19 @@ export default [
     name: 'logistics',
     component: Layout,
     redirect: '/logistics/index',
-    meta: { title: '菜鸟物流订单', icon: truckIcon, single: true },
+    meta: { title: '物流订单', icon: truckIcon, single: false },
     children: [
       {
         path: 'index',
         name: 'LogisticsIndex',
         component: () => import('@/pages/logistics/index.vue'),
-        meta: { title: '菜鸟物流订单' },
+        meta: { title: '菜鸟物流' },
       },
       {
         path: 'edit',
         name: 'LogisticsEdit',
         component: () => import('@/pages/logistics/edit/index.vue'),
-        meta: { title: '创建物流单' },
+        meta: { title: '创建物流单', hidden: true },
       },
     ],
   },
