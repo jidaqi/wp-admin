@@ -38,6 +38,17 @@ const Address = sequelize.define('Address', {
     type: DataTypes.TEXT,
     comment: '街道'
   },
+  createdAt: {
+    type: DataTypes.DATE,
+    defaultValue: DataTypes.NOW,
+    comment: '创建时间'
+  },
+  updatedAt: {
+    type: DataTypes.DATE,
+    defaultValue: DataTypes.NOW,
+    onUpdate: DataTypes.NOW,
+    comment: '更新时间'
+  }
 });
 
 module.exports = Address;

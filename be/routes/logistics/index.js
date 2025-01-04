@@ -122,6 +122,20 @@ module.exports = async function (
         })
       }
 
+      // 从 JWT 中解析用户信息
+      const decoded = await request.jwtVerify();
+      const userId = decoded.userId;
+
+      // 检查用户是否存在
+      const user = await fastify.sequelize.models.User.findByPk(userId);
+      if (!user) {
+        return reply.status(401).send({
+          code: -1,
+          message: '用户不存在或未授权',
+          data: null
+        });
+      }
+
       if (data && data?.data && data?.success === 'true') {
         await Logistics.create(
           {
@@ -132,6 +146,7 @@ module.exports = async function (
             senderParam: body.senderParam,
             receiverParam: body.receiverParam,
             returnerParam: body.returnerParam,
+            userId,
             ...data.data
           }, {
             include: [
@@ -149,7 +164,7 @@ module.exports = async function (
             { model: Address, as: 'returnerParam' },
           ]
         })
-        reply.send({
+        return reply.send({
           code: 0,
           data: null,
           message: '订单创建成功',
@@ -157,7 +172,7 @@ module.exports = async function (
         })
       } else {
         request.log.error({ 'CreateLogisticsError': data })
-        reply.send({
+        return reply.send({
           code: -1,
           data: null,
           message: `errorCode: ${data.errorCode} errorMsg: ${data.errorMsg}`
