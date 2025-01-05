@@ -2,7 +2,7 @@
  * @Author: Peihua
  * @Date: 2024-12-14 23:28:20
  * @LastEditors: Peihua
- * @LastEditTime: 2025-01-04 21:45:27
+ * @LastEditTime: 2025-01-06 00:30:52
  * @FilePath: \be\server.js
  * @Description: 
  */
@@ -67,7 +67,7 @@ closeWithGrace({ delay: process.env.FASTIFY_CLOSE_GRACE_DELAY || 500 }, async fu
 // 同步数据库并创建默认用户
 async function initializeDatabase(fastify) {
   try {
-    await db.sync({ force: true }); // 同步数据库，force: false 表示不删除现有表
+    await db.sync({ force: false }); // 同步数据库，force: false 表示不删除现有表
     fastify.log.info('数据库同步成功！'); // 使用 Fastify 日志记录
 
     // 检查并创建默认用户

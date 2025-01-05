@@ -3,6 +3,7 @@ const cainiaoConfig = require('../../config')
 const crypto = require('crypto')
 const Logistics = require('../../models/Logistics.model.js')
 const Address = require('../../models/Address.model.js')
+const User = require('../../models/User.model.js')
 const { Op } = require("sequelize")
 
 function md5(content, keys, charset = 'utf-8') {
@@ -127,7 +128,7 @@ module.exports = async function (
       const userId = decoded.userId;
 
       // 检查用户是否存在
-      const user = await fastify.sequelize.models.User.findByPk(userId);
+      const user = await User.findByPk(userId);
       if (!user) {
         return reply.status(401).send({
           code: -1,
@@ -208,6 +209,7 @@ module.exports = async function (
           { model: Address, as: 'doorPickupParam' },
           { model: Address, as: 'receiverParam' },
           { model: Address, as: 'returnerParam' },
+          { model: User, as: 'User', attributes: ['id', 'username', 'account'] }
         ],
         limit: pageSize,
         offset: pageSize * (page - 1),

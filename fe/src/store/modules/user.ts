@@ -2,7 +2,7 @@
  * @Author: Peihua
  * @Date: 2024-12-08 23:32:11
  * @LastEditors: Peihua
- * @LastEditTime: 2024-12-22 21:20:15
+ * @LastEditTime: 2025-01-06 00:29:51
  * @FilePath: \fe\src\store\modules\user.ts
  * @Description: 
  */
@@ -22,6 +22,7 @@ export const useUserStore = defineStore('user', {
     token: localStorage.getItem(TOKEN_NAME), // 默认token不走权限
     userInfo: { ...InitUserInfo },
     accountInfo: { account: undefined, password: undefined, isRemember: false },
+    username: undefined
   }),
   getters: {
     roles: (state) => {
@@ -38,7 +39,8 @@ export const useUserStore = defineStore('user', {
       });
 
       if (code === 0) {
-        this.token = data;
+        this.token = data.token;
+        this.username = data.username
 
         if (isRemember) {
           this.accountInfo = {

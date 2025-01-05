@@ -12,19 +12,30 @@
       >
         <t-row>
           <t-col :span="10">
-            <!-- <t-row :gutter="[16, 24]">
+            <t-row :gutter="[16, 24]">
               <t-col :span="3">
-                <t-form-item name="orderCode">
+                <t-form-item name="username">
                   <t-input-adornment
-                    prepend="物流订单号"
+                    prepend="用户名"
                     class="form-item-content"
                     :style="{ minWidth: '134px', width: '100%' }"
                   >
-                    <t-input v-model="formData.orderCode" type="search" clearable placeholder="请输入物流订单号" />
+                    <t-input v-model="formData.username" type="search" clearable placeholder="请输入用户名" />
                   </t-input-adornment>
                 </t-form-item>
               </t-col>
-            </t-row> -->
+              <t-col :span="3">
+                <t-form-item name="account">
+                  <t-input-adornment
+                    prepend="账号"
+                    class="form-item-content"
+                    :style="{ minWidth: '134px', width: '100%' }"
+                  >
+                    <t-input v-model="formData.account" type="search" clearable placeholder="请输入账号" />
+                  </t-input-adornment>
+                </t-form-item>
+              </t-col>
+            </t-row>
           </t-col>
 
           <t-col :span="2" class="operation-container">
@@ -60,6 +71,8 @@
         </t-table>
       </div>
     </div>
+
+    <AddAccount @add="fetchData" ref="addAccountRef" />
   </div>
 </template>
 <script setup lang="ts">
@@ -70,58 +83,41 @@ import dayjs from 'dayjs';
 import { getLogistics, cancel } from '@/api/logistics';
 import { useSettingStore } from '@/store';
 import { prefix } from '@/config/global';
+import { getUsers } from '@/api/user';
+import AddAccount from './AddAccount.vue';
 
 const store = useSettingStore();
 
 const COLUMNS: PrimaryTableCol<TableRowData>[] = [
   {
-    title: '物流订单号',
-    fixed: 'left',
-    width: 180,
+    title: '用户名',
     ellipsis: true,
     align: 'left',
-    colKey: 'orderCode',
+    colKey: 'username',
   },
   {
-    title: '末公里运单号',
-    width: 280,
+    title: '账号',
     ellipsis: true,
     align: 'left',
-    colKey: 'trackingNumber',
-  },
-  {
-    title: '收件人',
-    ellipsis: true,
-    align: 'left',
-    colKey: 'receiverParam.name',
-    width: 130,
-  },
-  {
-    title: '收件地址',
-    ellipsis: true,
-    align: 'left',
-    colKey: 'receiverParam.detailAddress',
-    width: 380,
+    colKey: 'account',
   },
   {
     title: '创建时间',
-    width: 200,
     ellipsis: true,
     align: 'left',
     colKey: 'createdAt',
   },
-  {
-    align: 'left',
-    fixed: 'right',
-    width: 200,
-    colKey: 'op',
-    title: '操作',
-  },
+  // {
+  //   align: 'left',
+  //   fixed: 'right',
+  //   colKey: 'op',
+  //   title: '操作',
+  // },
 ];
 
 const searchForm = {
-  orderCode: undefined,
-  solutionCode: undefined,
+  username: undefined,
+  account: undefined,
 };
 
 const formData = ref({ ...searchForm });
@@ -142,11 +138,11 @@ const dataLoading = ref(false);
 const fetchData = async () => {
   dataLoading.value = true;
   try {
-    const { data: list } = await getLogistics({
+    const { data: list } = await getUsers({
       page: pagination.value.current,
       pageSize: pagination.value.pageSize,
-      orderCode: formData.value.orderCode,
-      solutionCode: formData.value.solutionCode,
+      account: formData.value.account,
+      username: formData.value.username,
     });
     data.value = list.rows;
     pagination.value = {
@@ -185,9 +181,14 @@ const headerAffixedTop = computed(
     } as any), // TO BE FIXED
 );
 
+const addAccountRef = ref();
 const handleNewAccount = () => {
+  addAccountRef.value?.handleShow();
 };
 
+onMounted(() => {
+  fetchData();
+});
 </script>
 
 <style lang="less" scoped>

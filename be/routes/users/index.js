@@ -2,12 +2,13 @@
  * @Author: Peihua
  * @Date: 2025-01-04 19:47:11
  * @LastEditors: Peihua
- * @LastEditTime: 2025-01-04 22:05:32
+ * @LastEditTime: 2025-01-06 00:28:20
  * @FilePath: \be\routes\users\index.js
  * @Description: 
  */
 const S = require('fluent-json-schema')
 const User = require('../../models/User.model')
+const { Op } = require("sequelize")
 
 module.exports = async function (fastify, opts) {
   fastify.post('/login', async function (request, reply) {
@@ -60,7 +61,11 @@ module.exports = async function (fastify, opts) {
       reply.send({
         code: 0,
         message: '登录成功！',
-        data: token
+        data: {
+          token,
+          username: user?.username,
+          account: user?.account
+        }
       });
     } catch (error) {
       console.log(error)
@@ -74,7 +79,7 @@ module.exports = async function (fastify, opts) {
   });
 
   fastify.route({
-    url: '/user/list',
+    url: '/list',
     method: 'get',
     schema: {
       querystring: S.object()
@@ -155,7 +160,7 @@ module.exports = async function (fastify, opts) {
 
   fastify.route({
     method: 'POST',
-    url: '/user/add',
+    url: '/add',
     schema: {
       body: S.object()
         .prop('username', S.string().required().description('用户名'))
@@ -184,7 +189,7 @@ module.exports = async function (fastify, opts) {
 
       try {
         // 检查账号是否已存在
-        const existingUser = await fastify.sequelize.models.User.findOne({
+        const existingUser = await User.findOne({
           where: { account }
         });
 
@@ -196,8 +201,21 @@ module.exports = async function (fastify, opts) {
           });
         }
 
+        // 检查用户名是否已存在
+        const existingUsername = await User.findOne({
+          where: { username }
+        });
+
+        if (existingUsername) {
+          return reply.status(400).send({
+            code: -1,
+            message: '用户名已存在',
+            data: null
+          });
+        }
+
         // 创建新用户
-        const newUser = await fastify.sequelize.models.User.create({
+        const newUser = await User.create({
           username,
           account,
           password // 注意：实际应用中密码应加密存储

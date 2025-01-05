@@ -2,7 +2,7 @@
  * @Author: Peihua
  * @Date: 2024-12-08 23:32:11
  * @LastEditors: Peihua
- * @LastEditTime: 2024-12-10 06:05:31
+ * @LastEditTime: 2025-01-06 00:24:20
  * @FilePath: \fe\src\config\style.ts
  * @Description: 配置全局样式
  */
@@ -17,7 +17,7 @@ export default {
   isSidebarFixed: true,
   isHeaderFixed: true,
   isUseTabsRouter: false,
-  showHeader: false,
+  showHeader: true,
   backgroundTheme: 'blueGrey',
   brandTheme: 'default',
 };

@@ -158,6 +158,13 @@ const COLUMNS: PrimaryTableCol<TableRowData>[] = [
     width: 380,
   },
   {
+    title: '创建人',
+    width: 120,
+    ellipsis: true,
+    align: 'left',
+    colKey: 'User.username',
+  },
+  {
     title: '创建时间',
     width: 200,
     ellipsis: true,

@@ -7,23 +7,23 @@
         </span>
         <div v-else class="header-operate-left">
           <t-button theme="default" shape="square" variant="text" @click="changeCollapsed">
-            <t-icon class="collapsed-icon" name="view-list" />
+            <!-- <t-icon class="collapsed-icon" name="view-list" /> -->
           </t-button>
-          <search :layout="layout" />
+          <!-- <search :layout="layout" /> -->
         </div>
       </template>
       <template v-if="layout !== 'side'" #default>
-        <menu-content class="header-menu" :nav-data="menu" />
+        <!-- <menu-content class="header-menu" :nav-data="menu" /> -->
       </template>
       <template #operations>
         <div class="operations-container">
           <!-- 搜索框 -->
-          <search v-if="layout !== 'side'" :layout="layout" />
+          <!-- <search v-if="layout !== 'side'" :layout="layout" /> -->
 
           <!-- 全局通知 -->
-          <notice />
+          <!-- <notice /> -->
 
-          <t-tooltip placement="bottom" content="代码仓库">
+          <!-- <t-tooltip placement="bottom" content="代码仓库">
             <t-button theme="default" shape="square" variant="text" @click="navToGitHub">
               <t-icon name="logo-github" />
             </t-button>
@@ -32,13 +32,13 @@
             <t-button theme="default" shape="square" variant="text" @click="navToHelper">
               <t-icon name="help-circle" />
             </t-button>
-          </t-tooltip>
+          </t-tooltip> -->
           <t-dropdown :min-column-width="135" trigger="click">
             <template #dropdown>
               <t-dropdown-menu>
-                <t-dropdown-item class="operations-dropdown-container-item" @click="handleNav('/user/index')">
+                <!-- <t-dropdown-item class="operations-dropdown-container-item" @click="handleNav('/user/index')">
                   <t-icon name="user-circle"></t-icon>个人中心
-                </t-dropdown-item>
+                </t-dropdown-item> -->
                 <t-dropdown-item class="operations-dropdown-container-item" @click="handleLogout">
                   <t-icon name="poweroff"></t-icon>退出登录
                 </t-dropdown-item>
@@ -48,15 +48,15 @@
               <template #icon>
                 <t-icon class="header-user-avatar" name="user-circle" />
               </template>
-              <div class="header-user-account">Tencent</div>
+              <div class="header-user-account">{{ userStore.username }}</div>
               <template #suffix><t-icon name="chevron-down" /></template>
             </t-button>
           </t-dropdown>
-          <t-tooltip placement="bottom" content="系统设置">
+          <!-- <t-tooltip placement="bottom" content="系统设置">
             <t-button theme="default" shape="square" variant="text" @click="toggleSettingPanel">
               <t-icon name="setting" />
             </t-button>
-          </t-tooltip>
+          </t-tooltip> -->
         </div>
       </template>
     </t-head-menu>
@@ -67,7 +67,7 @@
 import { computed } from 'vue';
 import type { PropType } from 'vue';
 import { useRouter } from 'vue-router';
-import { useSettingStore } from '@/store';
+import { useSettingStore, useUserStore } from '@/store';
 import { getActive } from '@/router';
 import { prefix } from '@/config/global';
 import LogoFull from '@/assets/assets-logo-full.svg?component';
@@ -110,6 +110,7 @@ const props = defineProps({
 
 const router = useRouter();
 const settingStore = useSettingStore();
+const userStore = useUserStore();
 
 const toggleSettingPanel = () => {
   settingStore.updateConfig({
